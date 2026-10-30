@@ -1,0 +1,24 @@
+PIN MAP VALIDATION REPORT
+========================================
+
+Board: ESP32-WROOM-32 DevKit v1
+Repair rounds used: 0
+
+Round 1: 0 error(s), 1 warning(s)
+
+Final result:
+  [WARN ] pin.strapping: LED_STATUS: GPIO2 is a boot-strapping pin; confirm it is not held HIGH at power-on.
+
+Decoded pin map:
+  GPIO25  MOTOR_A_ENA    pwm     -> U2 ENA
+  GPIO26  MOTOR_A_IN1    output  -> U2 IN1
+  GPIO27  MOTOR_A_IN2    output  -> U2 IN2
+  GPIO14  MOTOR_B_ENB    pwm     -> U2 ENB
+  GPIO32  MOTOR_B_IN3    output  -> U2 IN3
+  GPIO33  MOTOR_B_IN4    output  -> U2 IN4
+  GPIO18  SONAR_TRIG     output  -> U3 TRIG
+  GPIO19  SONAR_ECHO     input   -> U3 ECHO (via 1k/2k divider)
+  GPIO34  IR_LEFT        input   -> U4 OUT
+  GPIO35  IR_RIGHT       input   -> U5 OUT
+  GPIO13  SERVO_SCAN     pwm     -> S1 SIG
+  GPIO 2  LED_STATUS     output  -> D1 anode

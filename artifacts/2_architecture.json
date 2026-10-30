@@ -1,0 +1,246 @@
+{
+  "board": "ESP32-WROOM-32 DevKit v1",
+  "summary": "One non-blocking control loop at 50 Hz. An L298N drives two DC motors; an HC-SR04 provides forward distance; two IR modules provide side awareness; a status LED and a JSON telemetry line expose the internal state. The servo scan is compiled in but disabled by default.",
+  "components": [
+    {
+      "ref": "U1",
+      "part": "ESP32-WROOM-32 DevKit v1",
+      "role": "controller"
+    },
+    {
+      "ref": "U2",
+      "part": "L298N dual H-bridge",
+      "role": "motor driver"
+    },
+    {
+      "ref": "U3",
+      "part": "HC-SR04 ultrasonic sensor",
+      "role": "forward distance"
+    },
+    {
+      "ref": "U4",
+      "part": "IR obstacle module (left)",
+      "role": "left edge"
+    },
+    {
+      "ref": "U5",
+      "part": "IR obstacle module (right)",
+      "role": "right edge"
+    },
+    {
+      "ref": "M1",
+      "part": "DC gear motor (left)",
+      "role": "actuator"
+    },
+    {
+      "ref": "M2",
+      "part": "DC gear motor (right)",
+      "role": "actuator"
+    },
+    {
+      "ref": "S1",
+      "part": "SG90 servo",
+      "role": "sensor scan",
+      "optional": true
+    },
+    {
+      "ref": "D1",
+      "part": "status LED",
+      "role": "state indication"
+    }
+  ],
+  "pin_map": [
+    {
+      "signal": "MOTOR_A_ENA",
+      "gpio": 25,
+      "direction": "pwm",
+      "connected_to": "U2 ENA",
+      "note": "left motor speed"
+    },
+    {
+      "signal": "MOTOR_A_IN1",
+      "gpio": 26,
+      "direction": "output",
+      "connected_to": "U2 IN1",
+      "note": ""
+    },
+    {
+      "signal": "MOTOR_A_IN2",
+      "gpio": 27,
+      "direction": "output",
+      "connected_to": "U2 IN2",
+      "note": ""
+    },
+    {
+      "signal": "MOTOR_B_ENB",
+      "gpio": 14,
+      "direction": "pwm",
+      "connected_to": "U2 ENB",
+      "note": "right motor speed"
+    },
+    {
+      "signal": "MOTOR_B_IN3",
+      "gpio": 32,
+      "direction": "output",
+      "connected_to": "U2 IN3",
+      "note": ""
+    },
+    {
+      "signal": "MOTOR_B_IN4",
+      "gpio": 33,
+      "direction": "output",
+      "connected_to": "U2 IN4",
+      "note": ""
+    },
+    {
+      "signal": "SONAR_TRIG",
+      "gpio": 18,
+      "direction": "output",
+      "connected_to": "U3 TRIG",
+      "note": ""
+    },
+    {
+      "signal": "SONAR_ECHO",
+      "gpio": 19,
+      "direction": "input",
+      "connected_to": "U3 ECHO (via 1k/2k divider)",
+      "note": "5 V sensor, divided"
+    },
+    {
+      "signal": "IR_LEFT",
+      "gpio": 34,
+      "direction": "input",
+      "connected_to": "U4 OUT",
+      "note": "input-only pin, active-low"
+    },
+    {
+      "signal": "IR_RIGHT",
+      "gpio": 35,
+      "direction": "input",
+      "connected_to": "U5 OUT",
+      "note": "input-only pin, active-low"
+    },
+    {
+      "signal": "SERVO_SCAN",
+      "gpio": 13,
+      "direction": "pwm",
+      "connected_to": "S1 SIG",
+      "note": "disabled by default"
+    },
+    {
+      "signal": "LED_STATUS",
+      "gpio": 2,
+      "direction": "output",
+      "connected_to": "D1 anode",
+      "note": "on-board LED, strapping pin"
+    }
+  ],
+  "power": {
+    "motor_supply": "2x18650 (7.4 V nominal) into L298N VIN; L298N 5 V out feeds the ESP32 VIN",
+    "servo_supply": "L298N 5 V rail, with a 470 uF capacitor across the servo terminals",
+    "common_ground": true,
+    "estimated_current_ma": {
+      "idle": 120,
+      "both_motors": 900,
+      "peak": 1800
+    }
+  },
+  "state_machine": {
+    "initial": "FORWARD",
+    "states": [
+      {
+        "name": "FORWARD",
+        "entry": "both motors forward at CRUISE_DUTY"
+      },
+      {
+        "name": "STOPPED",
+        "entry": "both motors off; brake for TURN_MS"
+      },
+      {
+        "name": "TURNING",
+        "entry": "left motor reverse, right motor forward for TURN_MS"
+      }
+    ],
+    "transitions": [
+      {
+        "from": "FORWARD",
+        "to": "STOPPED",
+        "when": "distance_cm < STOP_DISTANCE_CM"
+      },
+      {
+        "from": "FORWARD",
+        "to": "TURNING",
+        "when": "IR_LEFT is blocked and IR_RIGHT is clear"
+      },
+      {
+        "from": "STOPPED",
+        "to": "TURNING",
+        "when": "TURN_MS has elapsed"
+      },
+      {
+        "from": "TURNING",
+        "to": "FORWARD",
+        "when": "TURN_MS has elapsed and the path is clear"
+      }
+    ]
+  },
+  "timing": {
+    "loop_hz": 50,
+    "loop_period_ms": 20,
+    "sonar_period_ms": 60,
+    "turn_ms": 450,
+    "telemetry_baud": 115200
+  },
+  "constants": {
+    "STOP_DISTANCE_CM": 20,
+    "CLEAR_DISTANCE_CM": 30,
+    "CRUISE_DUTY": 180,
+    "TURN_DUTY": 200,
+    "PWM_FREQ_HZ": 1000,
+    "PWM_RESOLUTION_BITS": 8
+  },
+  "modules": [
+    {
+      "name": "motors",
+      "responsibility": "direction and speed control, forward/stop/turn primitives"
+    },
+    {
+      "name": "sonar",
+      "responsibility": "non-blocking HC-SR04 pulse and echo measurement"
+    },
+    {
+      "name": "sensing",
+      "responsibility": "IR edge flags"
+    },
+    {
+      "name": "control",
+      "responsibility": "the FORWARD/STOPPED/TURNING state machine"
+    },
+    {
+      "name": "telemetry",
+      "responsibility": "one JSON line per cycle"
+    },
+    {
+      "name": "status",
+      "responsibility": "LED blink pattern per state"
+    }
+  ],
+  "safety": "stop() is called on every transition into STOPPED and in setup() before the motors are ever energised. A distance reading of 0 cm or a timeout on the echo pulse is treated as an obstacle, so a failed sensor fails safe rather than driving blind.",
+  "_meta": {
+    "agent": "agent2_architecture",
+    "model_mode": "mock",
+    "model": "golden-example",
+    "generated_at": "2026-10-17T13:19:06+00:00",
+    "repair_rounds": 0,
+    "pin_map_status": "validated",
+    "errors": 0,
+    "warnings": 1
+  },
+  "_pin_checks": [
+    {
+      "level": "warning",
+      "rule": "pin.strapping",
+      "message": "LED_STATUS: GPIO2 is a boot-strapping pin; confirm it is not held HIGH at power-on."
+    }
+  ]
+}

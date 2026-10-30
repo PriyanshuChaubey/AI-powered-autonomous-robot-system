@@ -1,0 +1,211 @@
+{
+  "project": "Obstacle-Avoiding Robot with AI-Generated Firmware",
+  "mission": "Build a two-wheeled ESP32 robot that drives forward, measures the distance to the obstacle ahead with an ultrasonic sensor, and stops and turns before contact. The control firmware is produced by the project's AI pipeline, not written by hand.",
+  "functional_requirements": [
+    {
+      "id": "FR-1",
+      "text": "Drive both wheels forward at a configurable duty cycle."
+    },
+    {
+      "id": "FR-2",
+      "text": "Measure the distance ahead using an ultrasonic sensor at a fixed interval."
+    },
+    {
+      "id": "FR-3",
+      "text": "Stop the motors when the measured distance is below a safe threshold."
+    },
+    {
+      "id": "FR-4",
+      "text": "Turn away from the obstacle, then resume forward motion when the path clears."
+    },
+    {
+      "id": "FR-5",
+      "text": "Stream telemetry (state, distance, sensor readings) over serial at 115200 baud."
+    },
+    {
+      "id": "FR-6",
+      "text": "Indicate the current state with a status LED (blink while moving, solid while stopped)."
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "id": "NFR-1",
+      "text": "Control loop must run at approximately 50 Hz without blocking delays."
+    },
+    {
+      "id": "NFR-2",
+      "text": "Ultrasonic readings must be spaced at least 60 ms apart for sensor settling."
+    },
+    {
+      "id": "NFR-3",
+      "text": "No GPIO may exceed 3.3 V; the 5 V echo line requires a voltage divider."
+    },
+    {
+      "id": "NFR-4",
+      "text": "Firmware must build on both ESP32 Arduino core 2.x and 3.x."
+    },
+    {
+      "id": "NFR-5",
+      "text": "A single source file, under 300 lines, with named constants for every pin."
+    }
+  ],
+  "hardware_requirements": [
+    {
+      "id": "HR-1",
+      "part": "ESP32-WROOM-32 DevKit v1",
+      "qty": 1,
+      "purpose": "Controller"
+    },
+    {
+      "id": "HR-2",
+      "part": "L298N dual H-bridge",
+      "qty": 1,
+      "purpose": "Motor driver"
+    },
+    {
+      "id": "HR-3",
+      "part": "HC-SR04 ultrasonic sensor",
+      "qty": 1,
+      "purpose": "Forward distance"
+    },
+    {
+      "id": "HR-4",
+      "part": "IR obstacle module",
+      "qty": 2,
+      "purpose": "Left and right edge detection"
+    },
+    {
+      "id": "HR-5",
+      "part": "2WD chassis with two gear motors",
+      "qty": 1,
+      "purpose": "Locomotion"
+    },
+    {
+      "id": "HR-6",
+      "part": "SG90 servo (optional)",
+      "qty": 1,
+      "purpose": "Sensor scan mount"
+    },
+    {
+      "id": "HR-7",
+      "part": "2x 18650 cells + holder",
+      "qty": 1,
+      "purpose": "Power"
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "motor_left",
+      "kind": "pwm + gpio",
+      "signals": [
+        "EN",
+        "IN1",
+        "IN2"
+      ]
+    },
+    {
+      "name": "motor_right",
+      "kind": "pwm + gpio",
+      "signals": [
+        "EN",
+        "IN3",
+        "IN4"
+      ]
+    },
+    {
+      "name": "sonar",
+      "kind": "gpio",
+      "signals": [
+        "TRIG",
+        "ECHO"
+      ]
+    },
+    {
+      "name": "ir_left",
+      "kind": "digital in",
+      "signals": [
+        "OUT"
+      ]
+    },
+    {
+      "name": "ir_right",
+      "kind": "digital in",
+      "signals": [
+        "OUT"
+      ]
+    },
+    {
+      "name": "servo",
+      "kind": "pwm",
+      "signals": [
+        "SIG"
+      ],
+      "optional": true
+    },
+    {
+      "name": "led",
+      "kind": "digital out",
+      "signals": [
+        "ANODE"
+      ]
+    },
+    {
+      "name": "telemetry",
+      "kind": "uart",
+      "signals": [
+        "TX",
+        "RX"
+      ],
+      "baud": 115200
+    }
+  ],
+  "acceptance_tests": [
+    {
+      "id": "AT-1",
+      "given": "the robot is powered and the path is clear",
+      "when": "the loop runs",
+      "then": "both motors are driven forward and telemetry reports state=FORWARD"
+    },
+    {
+      "id": "AT-2",
+      "given": "an obstacle is placed 20 cm in front",
+      "when": "the next distance sample is taken",
+      "then": "the motors stop within one control cycle and state=STOPPED"
+    },
+    {
+      "id": "AT-3",
+      "given": "the robot is stopped at an obstacle",
+      "when": "the turn timer elapses",
+      "then": "the robot turns for a fixed duration and returns to FORWARD"
+    },
+    {
+      "id": "AT-4",
+      "given": "the serial monitor is open at 115200",
+      "when": "the robot runs",
+      "then": "one JSON telemetry line is printed per control cycle"
+    },
+    {
+      "id": "AT-5",
+      "given": "the code is compiled",
+      "when": "built against Arduino core 2.x and 3.x",
+      "then": "both builds succeed with no errors"
+    }
+  ],
+  "assumptions": [
+    "The HC-SR04 echo line is divided down to 3.3 V before reaching the ESP32.",
+    "The L298N is powered from the battery pack, with a common ground to the ESP32.",
+    "The IR modules are active-low (output goes LOW when an obstacle is detected).",
+    "Only forward, stop and a fixed-duration turn are required; no PID or mapping."
+  ],
+  "open_questions": [
+    "Should the servo scan be enabled in the first hardware demo or left for phase two?",
+    "What minimum obstacle distance is safe for the chassis at full duty cycle?"
+  ],
+  "_meta": {
+    "agent": "agent1_requirements",
+    "model_mode": "mock",
+    "model": "golden-example",
+    "generated_at": "2026-10-17T13:19:06+00:00",
+    "source_mission_chars": 401
+  }
+}

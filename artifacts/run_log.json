@@ -1,0 +1,22 @@
+{
+  "started_at": "2026-10-17T13:19:06+00:00",
+  "mode": "mock",
+  "mission_file": "/sessions/adoring-tender-noether/mnt/outputs/firmware_agents/examples/mission.txt",
+  "stages": [
+    {
+      "agent": 1,
+      "status": "ok"
+    },
+    {
+      "agent": 2,
+      "status": "ok",
+      "warnings": 1
+    },
+    {
+      "agent": 3,
+      "status": "ok"
+    }
+  ],
+  "status": "ok",
+  "duration_s": 0.37
+}

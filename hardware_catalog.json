@@ -1,0 +1,88 @@
+{
+  "board": {
+    "name": "ESP32-WROOM-32 DevKit v1",
+    "logic_voltage": 3.3,
+    "input_voltage_range": [5.0, 12.0],
+    "adc_max_voltage": 3.3,
+    "notes": "Do not feed more than 3.3 V into any GPIO. Use a divider on 5 V sensor outputs."
+  },
+  "constraints": {
+    "forbidden_gpio": [6, 7, 8, 9, 10, 11],
+    "forbidden_reason": "Wired to the on-board SPI flash. Using these bricks the board.",
+    "input_only_gpio": [34, 35, 36, 39],
+    "input_only_reason": "These pins have no output driver and no internal pull-ups.",
+    "strapping_gpio": [0, 2, 5, 12, 15],
+    "strapping_reason": "Their level at boot selects the flash/boot mode. Safe as inputs or short-lived outputs, risky as a pin that must be HIGH at power-on.",
+    "uart0_gpio": [1, 3],
+    "uart0_reason": "Reserved for the USB serial monitor.",
+    "adc2_gpio": [0, 2, 4, 12, 13, 14, 15, 25, 26, 27],
+    "adc2_reason": "ADC2 is unavailable while Wi-Fi is active. Use ADC1 pins (32-39) for analog reads when Wi-Fi is on."
+  },
+  "parts": [
+    {
+      "id": "esp32",
+      "part": "ESP32-WROOM-32 DevKit v1",
+      "category": "controller",
+      "qty": 1,
+      "interface": "wifi + gpio + pwm",
+      "purpose": "Runs the generated firmware and streams telemetry over Wi-Fi/USB serial.",
+      "unit_cost_inr": 450
+    },
+    {
+      "id": "l298n",
+      "part": "L298N dual H-bridge motor driver",
+      "category": "actuator_driver",
+      "qty": 1,
+      "interface": "2x pwm enable + 4x direction gpio",
+      "purpose": "Drives the two DC gear motors from the ESP32's 3.3 V logic.",
+      "unit_cost_inr": 130
+    },
+    {
+      "id": "hc_sr04",
+      "part": "HC-SR04 ultrasonic distance sensor",
+      "category": "sensor",
+      "qty": 1,
+      "interface": "trig output + echo input (5 V)",
+      "purpose": "Measures distance to the obstacle in front.",
+      "unit_cost_inr": 80,
+      "electrical_note": "ECHO outputs 5 V. Use a 1k/2k divider (or level shifter) before the ESP32 pin."
+    },
+    {
+      "id": "ir_pair",
+      "part": "IR obstacle sensor module (pair)",
+      "category": "sensor",
+      "qty": 2,
+      "interface": "digital output",
+      "purpose": "Detects a side obstacle / line edge for simple steering correction.",
+      "unit_cost_inr": 90
+    },
+    {
+      "id": "chassis_2wd",
+      "part": "2WD acrylic chassis with 2 gear motors and wheels",
+      "category": "mechanical",
+      "qty": 1,
+      "interface": "2x dc motor",
+      "purpose": "Robot body and locomotion.",
+      "unit_cost_inr": 450
+    },
+    {
+      "id": "servo_sg90",
+      "part": "SG90 micro servo",
+      "category": "actuator",
+      "qty": 1,
+      "interface": "pwm",
+      "purpose": "Optional scanner mount for the ultrasonic sensor.",
+      "unit_cost_inr": 120,
+      "electrical_note": "Draws current spikes; power from the 5 V rail, never from a GPIO."
+    },
+    {
+      "id": "battery_18650",
+      "part": "2x 18650 cells + holder",
+      "category": "power",
+      "qty": 1,
+      "interface": "7.4 V nominal",
+      "purpose": "Powers motors and the ESP32 through the L298N regulator.",
+      "unit_cost_inr": 350
+    }
+  ]
+}

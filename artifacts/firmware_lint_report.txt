@@ -1,0 +1,21 @@
+FIRMWARE LINT REPORT
+========================================
+
+Round 1: 0 error(s), 0 warning(s)
+
+Final result:
+  OK - no issues
+
+Cross-checked against pin map:
+  MOTOR_A_ENA    GPIO25
+  MOTOR_A_IN1    GPIO26
+  MOTOR_A_IN2    GPIO27
+  MOTOR_B_ENB    GPIO14
+  MOTOR_B_IN3    GPIO32
+  MOTOR_B_IN4    GPIO33
+  SONAR_TRIG     GPIO18
+  SONAR_ECHO     GPIO19
+  IR_LEFT        GPIO34
+  IR_RIGHT       GPIO35
+  SERVO_SCAN     GPIO13
+  LED_STATUS     GPIO2

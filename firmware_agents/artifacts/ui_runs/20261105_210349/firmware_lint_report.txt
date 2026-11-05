@@ -1,0 +1,35 @@
+ARDUINO UNO R3 - FIRMWARE LINT REPORT
+=======================================================
+
+TARGET BOARD: Arduino Uno R3 (ATmega328P)
+
+VALIDATION HISTORY
+-------------------------------------------------------
+Round 1: 0 error(s), 0 warning(s)
+
+FINAL LINT RESULT
+-------------------------------------------------------
+  OK - no issues
+
+ARCHITECTURE PIN MAP
+-------------------------------------------------------
+MOTOR_A_ENA: Arduino Uno pin 5
+MOTOR_A_IN1: Arduino Uno pin 7
+MOTOR_A_IN2: Arduino Uno pin 8
+MOTOR_B_ENB: Arduino Uno pin 6
+MOTOR_B_IN3: Arduino Uno pin 9
+MOTOR_B_IN4: Arduino Uno pin 10
+SONAR_TRIG: Arduino Uno pin 11
+SONAR_ECHO: Arduino Uno pin 12
+SERVO_SCAN: Arduino Uno pin 13
+
+HARDWARE SAFETY REMINDERS
+-------------------------------------------------------
+- Verify all wiring before connecting power.
+- Do not power the MG995 servo from the Uno 5V pin.
+- Use a separate regulated servo supply rated for its current.
+- Use an appropriate external supply for the DC motors.
+- Connect the Uno, motor driver and servo supply grounds.
+- Test with the robot wheels lifted before floor testing.
+- Verify emergency-stop and obstacle-stop behaviour.
+- Compile the sketch in Arduino IDE before uploading.

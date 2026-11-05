@@ -1,0 +1,36 @@
+{
+    "started_at": "2026-11-04T07:26:54+00:00",
+    "mode": "mock",
+    "target_board": "Arduino Uno R3 (ATmega328P)",
+    "mission_file": "D:\\AI powered Autonomous Robot System\\firmware_agents\\examples\\mission.txt",
+    "stages": [
+        {
+            "agent": 1,
+            "name": "Requirements Analysis",
+            "status": "ok",
+            "functional_requirements": 6,
+            "non_functional_requirements": 5,
+            "acceptance_tests": 5
+        },
+        {
+            "agent": 2,
+            "name": "Hardware Architecture",
+            "status": "ok",
+            "target_board": "Arduino Uno R3 (ATmega328P)",
+            "pin_assignments": 9,
+            "warnings": 0,
+            "repair_rounds": 0
+        },
+        {
+            "agent": 3,
+            "name": "Firmware Generation",
+            "status": "ok",
+            "firmware_files": 1,
+            "warnings": 0,
+            "lint_status": "passed"
+        }
+    ],
+    "status": "ok",
+    "finished_at": "2026-11-04T07:26:54+00:00",
+    "duration_s": 0.02
+}

@@ -1,0 +1,209 @@
+{
+    "board": "Arduino Uno R3 (ATmega328P)",
+    "summary": "Arduino Uno R3 controls a two-wheel differential-drive robot through an L298N motor driver. An HC-SR04 ultrasonic sensor measures obstacle distance and an MG995 servo positions the sensor. A computer running the Python agent and navigation pipeline communicates over USB serial. The design uses non-blocking control timing and a fail-safe motor stop.",
+    "components": [
+        {
+            "ref": "U1",
+            "part": "Arduino Uno R3",
+            "role": "Primary microcontroller"
+        },
+        {
+            "ref": "U2",
+            "part": "L298N dual H-bridge motor driver",
+            "role": "Two DC motor direction and speed control"
+        },
+        {
+            "ref": "U3",
+            "part": "HC-SR04 ultrasonic distance sensor",
+            "role": "Obstacle distance measurement"
+        },
+        {
+            "ref": "S1",
+            "part": "MG995 servo motor",
+            "role": "Ultrasonic sensor positioning"
+        },
+        {
+            "ref": "M1",
+            "part": "DC gear motor (left)",
+            "role": "Left wheel actuator"
+        },
+        {
+            "ref": "M2",
+            "part": "DC gear motor (right)",
+            "role": "Right wheel actuator"
+        },
+        {
+            "ref": "C1",
+            "part": "Computer running Python navigation software",
+            "role": "Multi-agent pipeline, path planning and serial communication"
+        }
+    ],
+    "pin_map": [
+        {
+            "signal": "MOTOR_A_ENA",
+            "gpio": 5,
+            "direction": "pwm",
+            "connected_to": "U2 ENA",
+            "note": "Left motor speed control"
+        },
+        {
+            "signal": "MOTOR_A_IN1",
+            "gpio": 7,
+            "direction": "output",
+            "connected_to": "U2 IN1",
+            "note": "Left motor direction"
+        },
+        {
+            "signal": "MOTOR_A_IN2",
+            "gpio": 8,
+            "direction": "output",
+            "connected_to": "U2 IN2",
+            "note": "Left motor direction"
+        },
+        {
+            "signal": "MOTOR_B_ENB",
+            "gpio": 6,
+            "direction": "pwm",
+            "connected_to": "U2 ENB",
+            "note": "Right motor speed control"
+        },
+        {
+            "signal": "MOTOR_B_IN3",
+            "gpio": 9,
+            "direction": "output",
+            "connected_to": "U2 IN3",
+            "note": "Right motor direction"
+        },
+        {
+            "signal": "MOTOR_B_IN4",
+            "gpio": 10,
+            "direction": "output",
+            "connected_to": "U2 IN4",
+            "note": "Right motor direction"
+        },
+        {
+            "signal": "SONAR_TRIG",
+            "gpio": 11,
+            "direction": "output",
+            "connected_to": "U3 TRIG",
+            "note": "Ultrasonic trigger"
+        },
+        {
+            "signal": "SONAR_ECHO",
+            "gpio": 12,
+            "direction": "input",
+            "connected_to": "U3 ECHO",
+            "note": "Ultrasonic echo input"
+        },
+        {
+            "signal": "SERVO_SCAN",
+            "gpio": 13,
+            "direction": "output",
+            "connected_to": "S1 SIG",
+            "note": "MG995 servo control using Servo library"
+        }
+    ],
+    "power": {
+        "controller_supply": "Arduino Uno compatible regulated supply",
+        "motor_supply": "External motor supply matched to the actual DC motor voltage and current ratings, connected through the L298N.",
+        "servo_supply": "Separate regulated 5-6 V supply with adequate current capacity for the MG995.",
+        "common_ground_required": true,
+        "battery_configuration": "Not yet confirmed",
+        "notes": "Do not power the MG995 directly from an Arduino GPIO or rely on the Uno 5 V pin to supply its motor current."
+    },
+    "state_machine": {
+        "initial": "STOPPED",
+        "states": [
+            {
+                "name": "STOPPED",
+                "entry": "Both motor enable signals are set to zero."
+            },
+            {
+                "name": "FORWARD",
+                "entry": "Both motors move forward at the configured speed."
+            },
+            {
+                "name": "TURNING",
+                "entry": "Differential motor control performs a timed turn."
+            },
+            {
+                "name": "OBSTACLE",
+                "entry": "Both motors stop while obstacle data is processed."
+            }
+        ],
+        "transitions": [
+            {
+                "from": "STOPPED",
+                "to": "FORWARD",
+                "when": "A valid forward command is received and the path is clear."
+            },
+            {
+                "from": "FORWARD",
+                "to": "OBSTACLE",
+                "when": "A valid obstacle measurement is below the safety threshold."
+            },
+            {
+                "from": "OBSTACLE",
+                "to": "TURNING",
+                "when": "The navigation controller issues a valid turn command."
+            },
+            {
+                "from": "TURNING",
+                "to": "STOPPED",
+                "when": "The configured turn duration ends."
+            },
+            {
+                "from": "FORWARD",
+                "to": "STOPPED",
+                "when": "A stop command, sensor fault or communication timeout occurs."
+            }
+        ]
+    },
+    "timing": {
+        "loop_hz": 50,
+        "loop_period_ms": 20,
+        "sonar_period_ms": 60,
+        "telemetry_baud": 115200,
+        "command_timeout_ms": 1000
+    },
+    "constants": {
+        "STOP_DISTANCE_CM": 20,
+        "CLEAR_DISTANCE_CM": 30,
+        "CRUISE_SPEED": 150,
+        "TURN_SPEED": 150,
+        "SERVO_CENTER_DEG": 90,
+        "SERVO_LEFT_DEG": 150,
+        "SERVO_RIGHT_DEG": 30,
+        "SERVO_SETTLE_MS": 300
+    },
+    "modules": [
+        {
+            "name": "motors",
+            "responsibility": "L298N direction and PWM speed control."
+        },
+        {
+            "name": "ultrasonic",
+            "responsibility": "HC-SR04 trigger, echo timing and distance calculation."
+        },
+        {
+            "name": "servo",
+            "responsibility": "MG995 positioning for directional sensor scans."
+        },
+        {
+            "name": "control",
+            "responsibility": "Safe motor control and robot state transitions."
+        },
+        {
+            "name": "communication",
+            "responsibility": "USB serial commands and telemetry."
+        }
+    ],
+    "safety": "motorsStop() is called during setup before any motor movement. Both motors stop when an obstacle is detected within the configured threshold. Invalid ultrasonic readings and echo timeouts are treated as unsafe measurements. Invalid commands and serial communication timeouts must result in a motor stop. The MG995 uses a separate regulated supply and all relevant grounds are common.",
+    "_meta": {
+        "agent": "agent2_architecture",
+        "target_board": "Arduino Uno R3",
+        "pin_map_status": "validated",
+        "status": "validated",
+        "repair_rounds": 0
+    }
+}

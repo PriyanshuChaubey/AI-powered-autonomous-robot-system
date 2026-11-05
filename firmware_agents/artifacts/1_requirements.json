@@ -1,0 +1,190 @@
+{
+  "project": "Multi-Agent AI-Based Autonomous Path Planning and Obstacle Avoidance Robot",
+  "mission": "Build a two-wheeled autonomous robot controlled by an Arduino Uno R3. The robot uses an HC-SR04 ultrasonic sensor mounted on an MG995 servo to detect obstacles. An L298N driver controls the two DC motors. A Python-based multi-agent system generates the hardware architecture and firmware, while the navigation system plans and replans routes.",
+  "functional_requirements": [
+    {
+      "id": "FR-1",
+      "text": "Drive the left and right DC motors independently through the L298N motor driver."
+    },
+    {
+      "id": "FR-2",
+      "text": "Measure the distance to obstacles using the HC-SR04 ultrasonic sensor."
+    },
+    {
+      "id": "FR-3",
+      "text": "Stop both motors when an obstacle is detected within the configured safety distance."
+    },
+    {
+      "id": "FR-4",
+      "text": "Control the MG995 servo to position the ultrasonic sensor for directional scanning."
+    },
+    {
+      "id": "FR-5",
+      "text": "Receive movement commands and transmit robot telemetry through USB serial communication."
+    },
+    {
+      "id": "FR-6",
+      "text": "Stop the motors when sensor measurements or incoming control commands are invalid."
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "id": "NFR-1",
+      "text": "The control loop shall use non-blocking millis()-based timing."
+    },
+    {
+      "id": "NFR-2",
+      "text": "Ultrasonic measurements shall be separated by at least 60 ms."
+    },
+    {
+      "id": "NFR-3",
+      "text": "All controller-connected digital signals shall remain within the Arduino Uno 5 V logic limits."
+    },
+    {
+      "id": "NFR-4",
+      "text": "Firmware shall use Arduino AVR-compatible APIs and compile for Arduino Uno R3."
+    },
+    {
+      "id": "NFR-5",
+      "text": "The generated firmware shall use only the validated architecture pin map."
+    }
+  ],
+  "hardware_requirements": [
+    {
+      "id": "HR-1",
+      "part": "Arduino Uno R3",
+      "qty": 1,
+      "purpose": "Primary robot controller."
+    },
+    {
+      "id": "HR-2",
+      "part": "L298N dual H-bridge motor driver",
+      "qty": 1,
+      "purpose": "Independent direction and speed control of two DC motors."
+    },
+    {
+      "id": "HR-3",
+      "part": "HC-SR04 ultrasonic distance sensor",
+      "qty": 1,
+      "purpose": "Obstacle distance measurement."
+    },
+    {
+      "id": "HR-4",
+      "part": "MG995 servo motor",
+      "qty": 1,
+      "purpose": "Directional positioning of the ultrasonic sensor."
+    },
+    {
+      "id": "HR-5",
+      "part": "Two-wheel robot chassis with DC gear motors",
+      "qty": 1,
+      "purpose": "Differential-drive robot platform."
+    },
+    {
+      "id": "HR-6",
+      "part": "Solderless breadboard",
+      "qty": 1,
+      "purpose": "Prototyping and signal connections."
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "motor_left",
+      "kind": "PWM + digital GPIO",
+      "signals": [
+        "ENA",
+        "IN1",
+        "IN2"
+      ]
+    },
+    {
+      "name": "motor_right",
+      "kind": "PWM + digital GPIO",
+      "signals": [
+        "ENB",
+        "IN3",
+        "IN4"
+      ]
+    },
+    {
+      "name": "ultrasonic_sensor",
+      "kind": "digital GPIO",
+      "signals": [
+        "TRIG",
+        "ECHO"
+      ]
+    },
+    {
+      "name": "servo",
+      "kind": "digital servo control",
+      "signals": [
+        "SIG"
+      ]
+    },
+    {
+      "name": "computer_communication",
+      "kind": "USB serial",
+      "signals": [
+        "TX",
+        "RX"
+      ],
+      "baud": 115200
+    }
+  ],
+  "acceptance_tests": [
+    {
+      "id": "AT-1",
+      "given": "the robot is powered and the motor driver is enabled",
+      "when": "a forward movement command is received",
+      "then": "both motors rotate in the forward direction."
+    },
+    {
+      "id": "AT-2",
+      "given": "an obstacle is detected within the configured safety distance",
+      "when": "the next valid distance measurement is processed",
+      "then": "both motors stop."
+    },
+    {
+      "id": "AT-3",
+      "given": "the robot is stationary",
+      "when": "a servo scan command is received",
+      "then": "the MG995 moves to the requested scan position."
+    },
+    {
+      "id": "AT-4",
+      "given": "the robot is connected to the computer over USB",
+      "when": "the controller operates",
+      "then": "telemetry is transmitted at 115200 baud."
+    },
+    {
+      "id": "AT-5",
+      "given": "the ultrasonic sensor returns no valid echo",
+      "when": "the measurement timeout occurs",
+      "then": "the motors remain stopped or enter the configured fail-safe state."
+    }
+  ],
+  "assumptions": [
+    "Arduino Uno R3 is the primary controller.",
+    "The MG995 uses a separate regulated 5-6 V supply with adequate current capacity.",
+    "The L298N motor supply is selected according to the actual DC motor ratings.",
+    "The motor driver, controller and servo supply share a common ground.",
+    "The exact battery configuration has not yet been confirmed.",
+    "Wheel encoders and an IMU are not currently confirmed, so precise odometry is not assumed.",
+    "USB serial is used for the initial computer-to-robot communication."
+  ],
+  "open_questions": [
+    "What are the rated voltage and stall current of the DC gear motors?",
+    "What battery and regulator configuration will be used?",
+    "What scan angles should be used for left, front and right obstacle measurements?",
+    "What movement command protocol should the Python navigation system use?"
+  ],
+  "_meta": {
+    "agent": "agent1_requirements",
+    "target_board": "Arduino Uno R3",
+    "model_mode": "mock",
+    "model": "golden-example",
+    "generated_at": "2026-11-04T07:26:54+00:00",
+    "source_mission_chars": 401,
+    "status": "validated"
+  }
+}

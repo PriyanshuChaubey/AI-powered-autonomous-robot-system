@@ -1,0 +1,128 @@
+
+{
+  "board": {
+    "name": "Arduino Uno R3",
+    "architecture": "AVR",
+    "microcontroller": "ATmega328P",
+    "logic_voltage": 5.0,
+    "operating_voltage": 5.0,
+    "input_voltage_range": [7.0, 12.0],
+    "adc_max_voltage": 5.0,
+    "digital_pins": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+    "pwm_pins": [3, 5, 6, 9, 10, 11],
+    "analog_pins": ["A0", "A1", "A2", "A3", "A4", "A5"],
+    "reserved_pins": [0, 1],
+    "notes": "Arduino Uno R3 is the primary robot controller. Pins 0 and 1 are reserved for USB serial communication. Use only 5V-compatible signals on digital inputs."
+  },
+  "constraints": {
+    "valid_gpio": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+    "pwm_gpio": [3, 5, 6, 9, 10, 11],
+    "reserved_gpio": [0, 1],
+    "reserved_reason": "Pins 0 and 1 are used for hardware UART and USB serial communication.",
+    "input_only_gpio": [],
+    "forbidden_gpio": [],
+    "analog_pins": ["A0", "A1", "A2", "A3", "A4", "A5"],
+    "logic_voltage": 5.0,
+    "max_gpio_voltage": 5.0,
+    "pwm_note": "Only pins 3, 5, 6, 9, 10 and 11 support PWM output.",
+    "serial_note": "Avoid assigning robot hardware signals to pins 0 and 1 because they are used for USB serial communication."
+  },
+  "parts": [
+    {
+      "id": "arduino_uno",
+      "part": "Arduino Uno R3",
+      "category": "controller",
+      "qty": 1,
+      "interface": "gpio + pwm + usb serial",
+      "purpose": "Primary microcontroller for motor control, ultrasonic sensing, servo control and communication with the Python navigation system."
+    },
+    {
+      "id": "arduino_nano",
+      "part": "Arduino Nano",
+      "category": "optional_controller",
+      "qty": 1,
+      "interface": "gpio + pwm + usb serial",
+      "purpose": "Optional secondary development controller. Not required for the initial robot prototype."
+    },
+    {
+      "id": "esp8266",
+      "part": "ESP8266 NodeMCU",
+      "category": "optional_communication",
+      "qty": 1,
+      "interface": "wifi + gpio + uart",
+      "purpose": "Optional Wi-Fi communication module for future wireless monitoring and control.",
+      "electrical_note": "Uses 3.3V logic. Do not connect 5V signals directly to ESP8266 GPIO pins."
+    },
+    {
+      "id": "l298n",
+      "part": "L298N dual H-bridge motor driver",
+      "category": "actuator_driver",
+      "qty": 1,
+      "interface": "2x pwm enable + 4x direction gpio",
+      "purpose": "Controls the speed and direction of the two DC gear motors.",
+      "electrical_note": "Motor power must come from a suitable external motor supply. Connect controller and driver grounds together."
+    },
+    {
+      "id": "hc_sr04",
+      "part": "HC-SR04 ultrasonic distance sensor",
+      "category": "sensor",
+      "qty": 1,
+      "interface": "trig output + echo input",
+      "purpose": "Measures the distance to obstacles in front of the robot.",
+      "electrical_note": "Operates with 5V supply and 5V-compatible signal levels. ECHO is compatible with Arduino Uno digital inputs."
+    },
+    {
+      "id": "servo_mg995",
+      "part": "MG995 servo motor",
+      "category": "actuator",
+      "qty": 1,
+      "interface": "pwm control signal",
+      "purpose": "Rotates the ultrasonic sensor to scan left, front and right directions.",
+      "electrical_note": "Requires a suitable separate regulated 5V to 6V supply with adequate current capacity. Do not power directly from an Arduino GPIO or rely on the Uno 5V pin."
+    },
+    {
+      "id": "chassis_2wd",
+      "part": "Two-wheel robot chassis with DC gear motors",
+      "category": "mechanical",
+      "qty": 1,
+      "interface": "2x dc motor",
+      "purpose": "Physical mobile robot platform for autonomous navigation and path planning."
+    },
+    {
+      "id": "breadboard",
+      "part": "Solderless breadboard",
+      "category": "prototyping",
+      "qty": 1,
+      "interface": "jumper wire connections",
+      "purpose": "Prototyping and connecting the sensor and controller circuits."
+    },
+    {
+      "id": "bluetooth_module",
+      "part": "Bluetooth serial module",
+      "category": "optional_communication",
+      "qty": 1,
+      "interface": "uart serial",
+      "purpose": "Optional wireless serial communication for robot commands and telemetry.",
+      "electrical_note": "Confirm the exact module model and voltage requirements before connecting it."
+    }
+  ],
+  "navigation": {
+    "robot_type": "differential_drive",
+    "primary_algorithm": "A*",
+    "comparison_algorithm": "Dijkstra",
+    "environment": "grid_based",
+    "obstacle_detection": "HC-SR04",
+    "sensor_scanning": "MG995 servo",
+    "dynamic_replanning": true,
+    "localization": "estimated_position",
+    "localization_note": "Wheel encoders and an IMU are not currently confirmed. Position estimates based on movement duration may drift."
+  },
+  "power": {
+    "controller_supply": "Arduino Uno compatible regulated supply",
+    "motor_supply": "External supply matched to DC motor ratings",
+    "servo_supply": "Separate regulated 5V to 6V supply with adequate current capacity",
+    "common_ground_required": true,
+    "battery_configuration": "Not yet confirmed",
+    "safety_note": "Do not assume a battery voltage or connect the motor and servo supplies until their ratings and wiring have been verified."
+  }
+}

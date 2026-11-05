@@ -1,0 +1,32 @@
+ARDUINO UNO R3 - HARDWARE ARCHITECTURE VALIDATION
+=======================================================
+
+Target board: Arduino Uno R3 (ATmega328P)
+
+PIN ASSIGNMENTS
+-------------------------------------------------------
+Unknown component | MOTOR_A_ENA | Pin: 5 | Mode: Not specified
+Unknown component | MOTOR_A_IN1 | Pin: 7 | Mode: Not specified
+Unknown component | MOTOR_A_IN2 | Pin: 8 | Mode: Not specified
+Unknown component | MOTOR_B_ENB | Pin: 6 | Mode: Not specified
+Unknown component | MOTOR_B_IN3 | Pin: 9 | Mode: Not specified
+Unknown component | MOTOR_B_IN4 | Pin: 10 | Mode: Not specified
+Unknown component | SONAR_TRIG | Pin: 11 | Mode: Not specified
+Unknown component | SONAR_ECHO | Pin: 12 | Mode: Not specified
+Unknown component | SERVO_SCAN | Pin: 13 | Mode: Not specified
+
+VALIDATION RESULT
+-------------------------------------------------------
+STATUS: PASSED
+Arduino Uno pin assignments passed architecture validation.
+
+IMPORTANT HARDWARE NOTES
+-------------------------------------------------------
+- Arduino Uno R3 is the primary controller.
+- Use analogWrite() only on supported PWM pins for motor speed.
+- MG995 servo signal can use a digital pin with the Servo library.
+- Do not power the MG995 directly from the Uno 5V pin.
+- Use an appropriate external motor supply for the L298N.
+- Connect all grounds together.
+- Do not assume encoders, IMU or IR sensors are installed.
+- Verify actual wiring and power ratings before running motors.
